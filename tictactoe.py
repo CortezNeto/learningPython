@@ -1,4 +1,5 @@
 import random
+import os
 
 class Jogador:
     def __init__(self, nome):
@@ -15,43 +16,38 @@ class Jogo:
         for i in range(len(self.tab)):
             print(*self.tab[i])
     
-    def realizarJogada(self):
-        if self.rodada % 2 == 0:            
-            lin = int(input("Indique a linha: "))
-            col = int(input("Indique a coluna: "))
-            if self.verificarVazios(lin, col) == True:
-                self.tab[lin][col] = "X"
-                self.rodada += 1
-            else:
-                while self.verificarVazios(lin, col) == False:
-                    lin = int(input("Espaço ocupado. Indique outra linha: "))
-                    col = int(input("Espaço ocupado. Indique outra coluna: "))
-                    if verificarVazios(lin, col) == True:
-                        self.tab[lin][col] = "X"
-                        self.rodada += 1
+    def realizarJogada(self):          
+        lin = int(input("Indique a linha: "))
+        col = int(input("Indique a coluna: "))
+        if self.verificarVazios(lin, col) == True:
+            self.tab[lin][col] = "X"
+            self.rodada += 1
         else:
-            lin = random.randint(0,2)
-            col = random.randint(0,2)
-
-            if self.verificarVazios(lin, col) == True:
-                self.tab[lin][col] = "O"
-                self.rodada += 1
-            else:
-                while self.verificarVazios(lin, col) == False:
-                    lin = random.randint(0,2)
-                    col = random.randint(0,2)
-                    if self.verificarVazios(lin, col) == True:
-                        self.tab[lin][col] = "O"
-                        self.rodada += 1
-                        break
+            while self.verificarVazios(lin, col) == False:
+                lin = int(input("Espaço ocupado. Indique outra linha: "))
+                col = int(input("Espaço ocupado. Indique outra coluna: "))
+                if self.verificarVazios(lin, col) == True:
+                    self.tab[lin][col] = "X"
+                    self.rodada += 1
+                    break
 
     def verificarVazios(self, lin, col):
-        for i in range(len(self.tab)):
-            for j in range(len(self.tab)):
-                if self.tab[lin][col] == "*":
-                    return True
-                else:
-                    return False
+        if self.tab[lin][col] == "*":
+            return True
+        else:
+            return False
+    
+    def IA(self):
+        list_moves = []
+        for i in range(3):
+            for j in range(3):
+                if self.tab[i][j] == "*":
+                    list_moves.append((i, j))
+        
+        if len(list_moves) > 0:
+            x, y = random.choice(list_moves)
+            self.tab[x][y] = "O"
+
     
     def verificarVitoria(self):
         if ((self.tab[0][0] == "X" and self.tab[1][1] == "X" and self.tab[2][2] == "X") or #diagonalprincipal
@@ -72,8 +68,17 @@ class Jogo:
         (self.tab[2][0] == "O" and self.tab[2][1] == "O" and self.tab[2][2] == "O") or #linha2
         (self.tab[2][0] == "O" and self.tab[1][1] == "O" and self.tab[0][2] == "O")):
             return 2
+        
         else: 
-            return 0
+            cont  = 0
+            for i in range(3):
+                for j in range(3):
+                    if self.tab[i][j] == "*":
+                        cont += 1
+                        return 0
+            if cont == 0:
+                return 3
+
 
 
 
@@ -83,10 +88,16 @@ player = Jogador("Eldio")
 game = Jogo(player, tab)
 
 while game.verificarVitoria() == 0:
+    os.system("cls")
     game.imprimirTabuleiro()
     game.realizarJogada()
-
-if game.verificarVitoria() == 1:
-    print("Jogador 1 venceu.")
-elif game.verificarVitoria() == 2:
-    print ("IA venceu")
+    game.IA()
+    if game.verificarVitoria() == 1:
+        print("Jogador 1 venceu.")
+        break
+    elif game.verificarVitoria() == 2:
+        print ("IA venceu")
+        break
+    elif game.verificarVitoria() == 3:
+        print("Empate")
+        break
